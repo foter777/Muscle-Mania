@@ -8,11 +8,15 @@ public class UIManager : MonoBehaviour
 {
     public TMP_Text score;
     public TMP_Text health;
+    public Slider slider;
     // Start is called before the first frame update
     void Start()
     {
-        Enemy.takeDamgage += UpdateHealth;
+        Enemy.takeDamage += UpdateHealth;
+        PickUp.pickUpItem += UpdateBar;
         health.text = Player.instance.health + "";
+        slider.maxValue = Player.instance.maxProtein;
+        slider.value = Player.instance.protein;
     }
 
     // Update is called once per frame
@@ -27,5 +31,12 @@ public class UIManager : MonoBehaviour
         Player.instance.health -= 1;
         health.text = Player.instance.health + "";
     }
+
+    public void UpdateBar()
+    {
+        slider.value = Player.instance.protein;
+
+    }
+
     
 }

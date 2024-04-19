@@ -20,28 +20,43 @@ public class Player : MonoBehaviour
     public float maxSpeed;
     public float distance;
     public float health;
+    public Animator animator;
+    public Transform punchHitbox;
+    public LayerMask enemyLayer;
+    public float punchRange;
+    private float punchTimer = 0;
+    public float punchCooldown;
+    public float damage;
+    public SpriteRenderer spriteRenderer;
+    public float protein;
+    public float maxProtein;
+    public float proteinModeDuration;
+    public bool proteinMode;
+    private Vector3 initalScale;
+    public UIManager uIManager;
     // Start is called before the first frame update
     private void Awake() 
     {
         instance = this;
+        
     }
     void Start()
     {
-        
+        initalScale = transform.localScale;
     }
 
     // Update is called once per frame
     void Update()
     {
         grounded = Physics2D.OverlapCircle(feetPos.position, groundHeight,layerMask);
-        if (grounded && Input.GetKeyDown(KeyCode.LeftAlt))
+        if (grounded && Input.GetKeyDown(KeyCode.LeftAlt) && !proteinMode)
         {
             jumpTimer = 0;
             jumping = true;
             rb.velocity = Vector2.up * jumpVelocity;
         }
 
-        if (jumping && Input.GetKey(KeyCode.LeftAlt))
+        if (jumping && Input.GetKey(KeyCode.LeftAlt) && !proteinMode)
         {
             if (jumpTimer < jumpTime)
             {
@@ -69,7 +84,63 @@ public class Player : MonoBehaviour
                 speed = maxSpeed;
             }
         }
+        punchTimer -= Time.deltaTime;
+        if (Input.GetKeyDown(KeyCode.LeftControl) && !proteinMode)
+        {
+            if (punchTimer <= 0)
+            {
+                punchTimer = punchCooldown;
+                Punch();
+            }
+            
+        }
+
+        if (protein == maxProtein)
+        {
+            proteinMode = true;
+            StartCoroutine(ProteinMode());
+           
+        }
+
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+        }
         
+    }
+
+    private void Punch()
+    {
+        animator.SetTrigger("Punch");
+
+        Collider2D hitEnemy = Physics2D.OverlapCircle(punchHitbox.position, punchRange, enemyLayer);
+        if (hitEnemy != null)
+        {
+            if (!hitEnemy.GetComponent<Enemy>().isObstacle)
+            {
+                hitEnemy.GetComponent<Enemy>().Damage(damage);
+            }
+        }
+        
+
+    }
+
+    private IEnumerator ProteinMode()
+    {
+        transform.localScale = new Vector3(1,1,1) * 3f;
+        yield return new WaitForSeconds(proteinModeDuration);
+        transform.localScale = initalScale;
+        protein = 0;
+        uIManager.UpdateBar();
+        yield return new WaitForSeconds(1f);
+        proteinMode = false;
+
+    } 
+    
+
+    private void OnDrawGizmosSelected() 
+    {
+        Gizmos.DrawWireSphere(punchHitbox.position, punchRange);
     }
 
 
