@@ -28,6 +28,7 @@ public class PickUp : MonoBehaviour
         {
             Player.instance.protein += 1;
             pickUpItem?.Invoke();
+            AudioManager.instance.PlayEffect(4);
             Destroy(gameObject);
         }
     }

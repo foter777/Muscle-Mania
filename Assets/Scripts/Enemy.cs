@@ -47,6 +47,7 @@ public class Enemy : MonoBehaviour
         // Move the object in the specified direction
         boxCollider2D.enabled = false;
         transform.Translate(direction * speed * 10 * Time.deltaTime);
+        //AudioManager.instance.PlayEffect(3);
     }
     private void OnTriggerEnter2D(Collider2D other) 
     {
@@ -60,6 +61,7 @@ public class Enemy : MonoBehaviour
             {
                 Damage(health);
             }
+            AudioManager.instance.PlayEffect(0);
         }
     }
 

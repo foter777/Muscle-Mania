@@ -18,12 +18,16 @@ public class BackgroundSpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-         spawnTimer -= Time.deltaTime;
-        if (spawnTimer <= 0)
+        spawnTimer -= Time.deltaTime;
+        if (Player.instance.distance < Player.instance.maxDistance)
         {
-            spawnTimer = Random.Range(minSpawnCooldown,maxSpawnCooldown);
-            Instantiate(buildings[Random.Range(0, buildings.Count)],transform.position,Quaternion.identity);
+            if (spawnTimer <= 0)
+            {
+                spawnTimer = Random.Range(minSpawnCooldown,maxSpawnCooldown);
+                Instantiate(buildings[Random.Range(0, buildings.Count)],transform.position,Quaternion.identity);
 
+            }
         }
+        
     }
 }

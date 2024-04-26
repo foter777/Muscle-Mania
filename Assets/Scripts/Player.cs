@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     public LayerMask layerMask;
     public Transform feetPos;
     public float jumpVelocity = 20;
-    public float groundHeight = 10;
+    public float groundHeight = 20;
     public bool grounded = false;
     public bool jumping = false;
     public float jumpTime;
@@ -19,6 +19,7 @@ public class Player : MonoBehaviour
     public float speed;
     public float maxSpeed;
     public float distance;
+    public float maxDistance;
     public float health;
     public Animator animator;
     public Transform punchHitbox;
@@ -34,6 +35,7 @@ public class Player : MonoBehaviour
     public bool proteinMode;
     private Vector3 initalScale;
     public UIManager uIManager;
+    public GameObject hitEffect;
     // Start is called before the first frame update
     private void Awake() 
     {
@@ -54,6 +56,7 @@ public class Player : MonoBehaviour
             jumpTimer = 0;
             jumping = true;
             rb.velocity = Vector2.up * jumpVelocity;
+            AudioManager.instance.PlayEffect(2);
         }
 
         if (jumping && Input.GetKey(KeyCode.LeftAlt) && !proteinMode)
@@ -104,7 +107,8 @@ public class Player : MonoBehaviour
 
         if (health <= 0)
         {
-            Destroy(gameObject);
+            UIManager.instance.GameOver();
+            Destroy(gameObject);    
         }
         
     }
@@ -112,13 +116,16 @@ public class Player : MonoBehaviour
     private void Punch()
     {
         animator.SetTrigger("Punch");
-
+        AudioManager.instance.PlayEffect(5);
         Collider2D hitEnemy = Physics2D.OverlapCircle(punchHitbox.position, punchRange, enemyLayer);
         if (hitEnemy != null)
         {
             if (!hitEnemy.GetComponent<Enemy>().isObstacle)
             {
+                GameObject newHitEffect = Instantiate(hitEffect, hitEnemy.transform.position, Quaternion.identity);
+                Destroy(newHitEffect, 0.1f);
                 hitEnemy.GetComponent<Enemy>().Damage(damage);
+                AudioManager.instance.PlayEffect(1);
             }
         }
         
